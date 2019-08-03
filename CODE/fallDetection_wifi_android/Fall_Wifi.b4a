@@ -1,0 +1,458 @@
+﻿Version=5.8
+NumberOfModules=0
+Build1=Default,b44.fall
+Build2=New_1,test.excel
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="14"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~SetApplicationAttribute(android:theme, "@android:style/Theme.Holo")~\n~AddManifestText(<uses-feature android:name="android.hardware.location.gps"/>)~\n~AddPermission(android.permission.RECEIVE_SMS)~\n~AddPermission(android.permission.READ_PHONE_STATE)~\n~'End of default text.~\n~
+IconFile=
+NumberOfFiles=2
+File1=login.bal
+File2=Text.txt
+NumberOfLibraries=5
+Library1=core
+Library2=network
+Library3=randomaccessfile
+Library4=gps
+Library5=phone
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: Fall Detection
+	
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: portrait
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: False
+#End Region
+
+Sub Process_Globals
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+			Dim GPSMinTime As Long								: GPSMinTime = 5000
+	Dim GPSMinDistance As Float						: GPSMinDistance = 10
+Dim GPS_On As Boolean									: GPS_On = False
+	
+	Dim GPS1 As GPS
+	Dim Server As ServerSocket
+		Dim ClientSocket  As Socket        
+    Dim AStreamClient As AsyncStreams
+	
+		Dim sms As PhoneSms
+	Dim mobile1 As String
+	Dim mobile2 As String
+		Dim intercept As SmsInterceptor 
+	Dim total As Int 
+	Dim timer1 As Timer
+	
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	'These variables can only be accessed from this module.
+	Public user As String
+	Public pass As String 	
+	Public ip2 As String 
+	Public ip1 As String 
+
+	Dim btnSend As Button
+	Dim btnClear As Button
+	Dim txtLog As EditText
+	Dim lblMsg As Label
+	Dim EditText1 As EditText 
+	Dim EditText2 As EditText 
+	Dim txtTable As EditText 
+	Dim txtGuests As EditText 
+	Dim listview1 As ListView 
+		Dim listview2 As ListView 
+			Dim listview3 As ListView 
+				Dim listview4 As ListView 
+	Dim txtRate As EditText 
+	Dim txtQuantity As EditText 
+	Dim cmdAdd As Button
+	
+	Private Connect1 As Button
+	Private Connect2 As Button
+	
+	Private txtIp1 As EditText
+	Private txtIp2 As EditText
+
+	Private IP As Label
+	Private IOT As Label
+	Private lbIpAtual As Label
+	
+		Private txtD1 As EditText	
+	Private txtD2 As EditText
+	
+	Private btnManual As RadioButton
+	Private Exit As Button
+	Private btnAuto As RadioButton
+	Private btnD3On As Button
+	Private lblIP As Label
+	Private lblD1 As Label
+	Private lblD2 As Label
+	Private btnD1On As Button
+	Private btnD1Off As Button
+	Private btnD2On As Button
+	Private btnD2Off As Button
+	Private Label1 As Label
+	Private Spinner1 As Spinner
+	Private btnD3Off As Button
+
+
+	Private Panel1 As Panel
+	Private RadioButton1 As RadioButton
+	Private RadioButton2 As RadioButton
+	Private EditText1 As EditText
+	Private Button1 As Button
+	Private Button2 As Button
+	Private Button3 As Button
+	Private Button4 As Button
+	Private Spinner2 As Spinner
+	Private Button6 As Button
+	Private Button5 As Button
+	Private Button7 As Button
+	Private Panel2 As Panel
+	Private txtUser As EditText
+	Private txtPass As EditText
+	Private cmdLogin As Button
+	Private Label2 As Label
+	Private Label3 As Label
+	Private Label1L As Label
+	Private Label2L As Label
+	Private Label3L As Label
+	Private Table1 As Button
+	Private Table2 As Button
+	Private cmdStatus As Button
+	Private Label8 As Label
+	Private Label5 As Label
+	Private Label6 As Label
+	Private Label7 As Label
+	Private EditText4 As EditText
+	Private EditText5 As EditText
+	Private EditText6 As EditText
+	Private Label4 As Label
+	Private EditText3 As EditText
+	Private lblLongitude As EditText
+	Private lblLatitude As EditText
+	Private Label9 As Label
+	Private Label10 As Label
+	Private cmdSBack As Button
+	Private cmdSave As Button
+	Private txtMobile2 As EditText
+	Private txtMobile1 As EditText
+	Private txtUserSave As EditText
+	Private btAtivaClient As Button
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	'Do not forget to load the layout file created with the visual designer. For example:
+	Activity.LoadLayout("Login")
+	GPS1.Initialize("GPS1")
+		If GPS1.GPSEnabled = False Then
+					ToastMessageShow("Please enable the GPS device." & CRLF & "And press the BACK button", True)
+					StartActivity(GPS1.LocationSettingsIntent)
+				End If
+				
+			timer1.Initialize("Timer1", 1000) ' start timer1 for 3 secs
+			timer1.Enabled=False
+GPS_On = True
+	
+End Sub
+
+Sub Activity_Resume
+	 If GPS1.GPSEnabled = False Then
+       ToastMessageShow("Please enable the GPS device.", True)
+       StartActivity(GPS1.LocationSettingsIntent) 'Will open the relevant settings screen.
+  		
+   End If
+   
+'If GPS_On = True Then
+		GPS1.Start(GPSMinTime, GPSMinDistance)
+		
+		
+'	End If
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+      '  AStreamClient.Close
+      '  ClientSocket.Close
+
+End Sub
+
+Sub GPS1_LocationChanged (Location1 As Location)
+
+	
+  lblLatitude.Text = NumberFormat(Location1.Latitude, 1, 6)
+  lblLongitude.Text = NumberFormat(Location1.Longitude, 1, 6)
+	
+End Sub
+Sub AStreamClient_NewData (Buffer() As Byte)
+    Dim msg As String
+   ' msg = BytesToString(Buffer, 0, Buffer.Length, "UTF8")
+   EditText1.Text=""
+	EditText1.Text =EditText1.Text & BytesToString(Buffer, 0, Buffer.Length, "UTF8")
+	If Not(EditText1.Text.SubString2(0,1)="F")Then   
+			EditText1.Text=""
+	Else
+			timer1.Interval=25000
+		timer1.Enabled=True
+		
+	
+		
+	End If
+	
+
+
+    ToastMessageShow(msg, False)
+    'Log(msg)
+End Sub
+
+Sub Timer1_tick
+	Dim str1 As String
+		str1= "User ID:" & user & CRLF & "Fall Detected" & CRLF & "Location: http://www.google.com/maps/place/" & lblLatitude.Text & "," & lblLongitude.Text
+	
+	sms.Send(mobile1,str1)
+		sms.Send(mobile2,str1)
+		EditText1.Text=""
+		timer1.Enabled=False
+End Sub
+Sub btnClear_Click
+End Sub
+
+Sub btAtivaClient_Click
+   ' If Not(ClientSocket.IsInitialized) Then
+   '    ClientSocket.Initialize("ClientSocket")
+   ' End If
+	
+    If Not(ClientSocket.IsInitialized) Then
+    	ClientSocket.Initialize("ClientSocket")
+	Else
+		ClientSocket.Close
+		ClientSocket.Initialize("ClientSocket")
+	End If
+	ClientSocket.Connect(EditText3.Text, EditText5.Text, 5000)	'port no 8080
+	'lbIpAtual.Text = lbIpAtual.Text & " " & EditText3.Text & EditText5.Text
+	
+End Sub
+
+Sub ClientSocket_Connected (Successful As Boolean)
+    If Successful Then
+       AStreamClient.Initialize(ClientSocket.InputStream,ClientSocket.OutputStream, "AStreamClient")
+	   ToastMessageShow("Successfully connected", True)
+    Else
+    	ToastMessageShow("No connection!", True)
+   	End If
+End Sub
+'Sub Connect1_Click
+'	
+''	lbIpAtual.Text = lbIpAtual.Text & " " & edIP.Text & " " & edPort.Text
+'	ip1="192.168.4.1" 
+'		If Not(ClientSocket.IsInitialized) Then
+'    		ClientSocket.Initialize("ClientSocket")
+'		Else
+'			ClientSocket.Close
+'			ClientSocket.Initialize("ClientSocket")
+'		End If
+'	
+'	ClientSocket.Connect(ip1, 8080, 2000)	
+'End Sub
+'Sub Connect2_Click
+'	Panel1.Visible =True 
+'	totalAmt=0
+'End Sub
+'Sub ClientSocket_Connected (Successful As Boolean)
+'    If Successful Then
+'       AStreamClient.Initialize(ClientSocket.InputStream,ClientSocket.OutputStream, "AStreamClient")
+'	   ToastMessageShow("Successfully connected", True)
+'    Else
+'    	ToastMessageShow("No connection!", True)
+'   	End If
+'End Sub
+'
+'Sub ListView1_ItemClick (Position As Int, Value As Object)
+'
+'
+'
+'
+'End Sub
+'Sub cmdAdd_Click
+'	
+'End Sub
+'Sub btnSend_Click
+'	
+'Dim buffer() As Byte
+'If AStreamClient.IsInitialized Then
+'		EditText1.Text="*o" & txtTable.Text
+'		'buffer =EditText1.Text.GetBytes("UTF8")
+'		'AStreamClient.Write(buffer)
+'		
+'	For i=0 To itemCount-1 
+'		
+'		EditText1.Text=EditText1.Text & listview2.GetItem(i)
+'		'buffer =EditText1.Text.GetBytes("UTF8")
+'		'AStreamClient.Write(buffer)
+'		
+'		EditText1.Text=EditText1.Text & ","
+'		'buffer =EditText1.Text.GetBytes("UTF8")
+'		'AStreamClient.Write(buffer)
+'		
+''		EditText1.Text=listview3.GetItem(i)
+''		qty=EditText1.Text
+''		buffer =EditText1.Text.GetBytes("UTF8")
+''		AStreamClient.Write(buffer)
+''		
+''		EditText1.Text=","
+''		buffer =EditText1.Text.GetBytes("UTF8")
+''		AStreamClient.Write(buffer)
+'		
+'		EditText1.Text=EditText1.Text & listview4.GetItem(i)
+'		'amt=EditText1.Text
+'		'buffer =EditText1.Text.GetBytes("UTF8")
+'		'AStreamClient.Write(buffer)
+'		
+'		EditText1.Text=EditText1.Text & "."
+'		'buffer =EditText1.Text.GetBytes("UTF8")
+'		'AStreamClient.Write(buffer)
+'		
+'	Next
+'		EditText1.Text=EditText1.Text & "Total:-" & Label3.Text
+'		EditText1.Text=EditText1.Text & "#"
+'		buffer =EditText1.Text.GetBytes("UTF8")
+'		AStreamClient.Write(buffer)
+'		
+'End If
+'End Sub
+'
+'
+'Sub Delay(nMilliSecond As Long)
+'Dim nBeginTime As Long
+'Dim nEndTime As Long
+'nEndTime = DateTime.Now + nMilliSecond
+'nBeginTime = DateTime.Now
+'Do While nBeginTime < nEndTime
+'nBeginTime = DateTime.Now
+'Log(nBeginTime)
+'If nEndTime < nBeginTime Then
+'Return
+'End If
+'DoEvents
+'Loop
+'End Sub
+Sub btnD2On_Click
+
+End Sub
+Sub btnD2Off_Click
+End Sub
+
+Sub btnD3On_Click
+End Sub
+
+
+Sub btnD3Off_Click
+End Sub
+
+Sub Exit_Click
+	Panel1.Visible =False
+End Sub
+
+Sub Button1_Click
+Panel2.Visible=True
+End Sub
+
+Sub cmdLogin_Click
+	ReadTextReader
+	If (txtUser.Text =user)Then
+		Panel1.Visible=True
+	Else
+		ToastMessageShow("Invalid User",True)	
+	End If
+	
+End Sub
+'
+Sub WriteTextWriter
+    Dim TextWriter1 As TextWriter
+    TextWriter1.Initialize(File.OpenOutput(File.DirInternal, "Text.txt", False))
+    'For i = 1 To 10
+     '   TextWriter1.WriteLine("Line" & i)
+    'Next
+	TextWriter1.WriteLine(txtUserSave.Text)
+	TextWriter1.WriteLine(txtMobile1.Text)
+	TextWriter1.WriteLine(txtMobile2.Text)
+	
+    TextWriter1.Close
+	ReadTextReader
+End Sub
+
+Sub ReadTextReader
+    Dim TextReader1 As TextReader
+	If Not (File.Exists(File.DirInternal, "Text.txt")) Then
+		user="admin"
+		mobile1="9545330808"
+		mobile2="7798058282"
+		
+		WriteTextWriter
+	End If
+    TextReader1.Initialize(File.OpenInput(File.DirInternal, "Text.txt"))
+'    Dim line As String
+'	Dim count As Int
+'	count=0
+	user=TextReader1.ReadLine   
+    mobile1 = TextReader1.ReadLine   
+	 mobile2 = TextReader1.ReadLine    
+	 txtUserSave.Text=user
+	 txtMobile1.Text=mobile1
+	 txtMobile2.Text =mobile2
+'    Do While line <> Null
+'		
+'        Log(line) 'write the line to LogCat
+'		If count=0 Then
+'        	user = line
+'			count=count+1
+'		Else If count=1 Then	
+'			pass=line
+'			count=2
+'		End If	
+'		line = TextReader1.ReadLine 
+'    Loop
+'	If count=0 Then
+'		user="admin"
+'		pass="1234"
+'		WriteTextWriter
+'	End If
+    TextReader1.Close
+End Sub
+
+'Sub RemoveViews
+'Dim i As Int
+'
+'For i=Activity.NumberOfViews-1 To 0 Step -1
+'  Activity.RemoveViewAt(i)
+'Next
+'End Sub
+'
+'Sub Label1_Click
+'	
+'End Sub
+
+
+
+Sub cmdSBack_Click
+	Panel2.Visible=False
+End Sub
+
+Sub cmdSave_Click
+	WriteTextWriter
+End Sub
+
+Sub Button2_Click
+	EditText1.Text=""
+End Sub
+
+Sub Button3_Click
+	timer1.Enabled=False
+	EditText1.Text=""
+End Sub
