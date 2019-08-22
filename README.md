@@ -4,5 +4,5 @@ Emergency Fall Notification System is an application of IoT domain. It is a wear
 Find all the info in the below paper published by me:
 http://www.ijcea.com/iot-based-wearable-device-emergency-fall-notification/
 
-Thanks,
+Regards,
 Somya
